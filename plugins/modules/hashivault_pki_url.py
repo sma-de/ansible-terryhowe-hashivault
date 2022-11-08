@@ -2,7 +2,6 @@
 from ansible_collections.terryhowe.hashivault.plugins.module_utils.hashivault import hashivault_auth_client
 from ansible_collections.terryhowe.hashivault.plugins.module_utils.hashivault import hashivault_argspec
 from ansible_collections.terryhowe.hashivault.plugins.module_utils.hashivault import hashivault_init
-from ansible_collections.terryhowe.hashivault.plugins.module_utils.hashivault import compare_state
 from ansible_collections.terryhowe.hashivault.plugins.module_utils.hashivault import hashiwrapper
 
 ANSIBLE_METADATA = {'status': ['preview'], 'supported_by': 'community', 'version': '1.1'}
