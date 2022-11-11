@@ -59,10 +59,16 @@ def hashivault_pki_role_list(module):
 
     mount_point = params.get('mount_point').strip('/')
 
+    result = {"changed": False, "rc": 0}
+
     try:
-        return {'data': client.secrets.pki.list_roles(mount_point=mount_point).get('data').get('keys')}
-    except Exception:
-        return {'data': []}
+        result['data'] = client.secrets.pki.list_roles(mount_point=mount_point).get('data', {}).get('keys', [])
+    except Exception as e:
+        result['rc'] = 1
+        result['failed'] = True
+        result['msg'] = u"Exception: " + str(e)
+
+    return result
 
 
 if __name__ == '__main__':
