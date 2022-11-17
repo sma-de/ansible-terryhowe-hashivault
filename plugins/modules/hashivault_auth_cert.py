@@ -107,8 +107,6 @@ def hashivault_auth_cert(module):
     except InvalidPath:
         role_exists = False
 
-    assert False, "{}, {}, breaker => {}".format(role_name, state, str(desired_state))
-
     if state == 'absent':
         ## handle absent state
         if not role_exists:
@@ -126,8 +124,8 @@ def hashivault_auth_cert(module):
     ## handle present state
 
     # check if current config matches desired config values, if they match, set changed to false to prevent action
-    for k, v in current_state.items():
-        if v != desired_state[k]:
+    for k, v in desired_state.items():
+        if v != current_state[k]:
             changed = True
 
     # if configs dont match and checkmode is off, complete the change
