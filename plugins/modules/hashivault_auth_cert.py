@@ -94,6 +94,8 @@ def hashivault_auth_cert(module):
     current_state = dict()
     role_exists = True
 
+    assert False, "{}, {}, breaker => {}".format(role_name, state, str(desired_state))
+
     try:
         result = client.auth.cert.read_ca_certificate_role(
             role_name, mount_point=desired_state['mount_point']
