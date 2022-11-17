@@ -29,7 +29,7 @@ options:
     display_name:
         description:
           - Display name for this cert endpoint.
-        default: i(name)
+        default: I(name)
     policies:
         description:
           - List of vault policies attached to this auth endpoint.
@@ -37,6 +37,10 @@ options:
         description:
           - Maximal time to live for auth returned token, defaults to "0" aka unlimited.
         default: 0
+    state:
+        description:
+          - If this cert role should be present or absent after configuration.
+        default: present
 extends_documentation_fragment: hashivault
 '''
 EXAMPLES = '''
@@ -53,11 +57,12 @@ EXAMPLES = '''
 def main():
     argspec = hashivault_argspec()
     argspec['name'] = dict(required=True, type='str')
-    argspec['policies'] = dict(required=True, type='str')
+    argspec['policies'] = dict(required=True, type='list', elements='str')
     argspec['certificate'] = dict(required=True, type='str')
     argspec['mount_point'] = dict(required=False, type='str', default='auth/cert')
-    argspec['display_name'] = dict(required=False, type='str', default=False) <--- TODO
+    argspec['display_name'] = dict(required=False, type='str', default=None)
     argspec['ttl'] = dict(required=False, type='int', default=0)
+    argspec['state'] = dict(required=True, type='str', choices=['present', 'absent'])
 
     module = hashivault_init(argspec, supports_check_mode=True)
     result = hashivault_auth_cert(module)
@@ -74,21 +79,24 @@ def hashivault_auth_cert(module):
     changed = False
     desired_state = dict()
 
+    result = {'changed': changed}
+
     role_name = params.get('name')
+    state = params.get('state')
 
     desired_state['certificate'] = params.get('certificate')
     desired_state['policies'] = sorted(params.get('policies'))
     desired_state['mount_point'] = params.get('mount_point')
-    desired_state['display_name'] = params.get('display_name')
+    desired_state['display_name'] = params.get('display_name') or role_name
     desired_state['ttl'] = params.get('ttl')
 
     # check current config
     current_state = dict()
+    role_exists = True
 
     try:
         result = client.auth.cert.read_ca_certificate_role(
-            desired_state['name'],
-            mount_point=desired_state['mount_point']
+            role_name, mount_point=desired_state['mount_point']
         )['data']
 
         assert False, "da res => {}".format(result)
@@ -97,7 +105,23 @@ def hashivault_auth_cert(module):
         current_state['display_name'] = result['display_name']
         current_state['ttl'] = result['ttl']
     except InvalidPath:
-        pass
+        role_exists = False
+
+    if state == 'absent':
+        ## handle absent state
+        if not role_exists:
+            # trying to absent a non existing role => noop
+            return result
+
+        client.auth.cert.delete_certificate_role(role_name,
+          mount_point=desired_state['mount_point']
+        )
+
+        # existing role should be absented => delete it
+        result['changed'] = True
+        return result
+
+    ## handle present state
 
     # check if current config matches desired config values, if they match, set changed to false to prevent action
     for k, v in current_state.items():
