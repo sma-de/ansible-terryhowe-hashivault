@@ -125,8 +125,13 @@ def hashivault_auth_cert(module):
 
     # check if current config matches desired config values, if they match, set changed to false to prevent action
     for k, v in desired_state.items():
+        if k not in current_state:
+            changed = True
+            break
+
         if v != current_state[k]:
             changed = True
+            break
 
     # if configs dont match and checkmode is off, complete the change
     if changed and not module.check_mode:
