@@ -138,7 +138,7 @@ def hashivault_auth_cert(module):
         desired_state['token_ttl'] = desired_state.pop('ttl')
         desired_state['token_policies'] = desired_state.pop('policies')
 
-        client.auth.cert.create_ca_certificate_role(name,
+        client.auth.cert.create_ca_certificate_role(role_name,
            desired_state.pop('certificate'), **desired_state
         )
 
