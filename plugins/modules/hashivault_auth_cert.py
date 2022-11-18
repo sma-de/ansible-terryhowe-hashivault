@@ -99,11 +99,10 @@ def hashivault_auth_cert(module):
             role_name, mount_point=desired_state['mount_point']
         )['data']
 
-        assert False, "da res => {}".format(result)
-        current_state['policies'] = sorted(result['policies'].split(','))
+        current_state['policies'] = sorted(result['token_policies'])
         current_state['certificate'] = result['certificate']
         current_state['display_name'] = result['display_name']
-        current_state['ttl'] = result['ttl']
+        current_state['ttl'] = result['token_ttl']
     except InvalidPath:
         role_exists = False
 
