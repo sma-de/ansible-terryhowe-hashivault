@@ -140,9 +140,22 @@ def hashivault_auth_cert(module):
         desired_state['token_ttl'] = desired_state.pop('ttl')
         desired_state['token_policies'] = desired_state.pop('policies')
 
-        with tempfile.NamedTemporaryFile(mode='w') as tf:
+        ##
+        ## note: unfortunately passing the certificate directly as string
+        ##   is not safe for hvac versions < 1.0 as the old hvac implementation
+        ##   tries to parse the given value first opportunistically as file
+        ##   name and tries to open it not properly handling all the error
+        ##   this might produce, so the only save workaround atm is to pass
+        ##   the cert indirectly over a tmpfile
+        ##
+        ## TODO: remove this tempfile workaround when this collection become > hvac v1.0  compatible
+        ##
+        with open('/tmp/foobar', mode='w') as tf:
+            tf.write(desired_state['certificate'])
 
+        with tempfile.NamedTemporaryFile(mode='w') as tf:
             tf.write(desired_state.pop('certificate'))
+            tf.flush()
 
             client.auth.cert.create_ca_certificate_role(role_name,
                tf.name, **desired_state
