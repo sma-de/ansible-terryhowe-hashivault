@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+
+import tempfile
+
 from ansible_collections.terryhowe.hashivault.plugins.module_utils.hashivault import hashivault_argspec
 from ansible_collections.terryhowe.hashivault.plugins.module_utils.hashivault import hashivault_auth_client
 from ansible_collections.terryhowe.hashivault.plugins.module_utils.hashivault import hashivault_init
@@ -137,9 +140,13 @@ def hashivault_auth_cert(module):
         desired_state['token_ttl'] = desired_state.pop('ttl')
         desired_state['token_policies'] = desired_state.pop('policies')
 
-        client.auth.cert.create_ca_certificate_role(role_name,
-           desired_state.pop('certificate'), **desired_state
-        )
+        with tempfile.NamedTemporaryFile(mode='w') as tf:
+
+            tf.write(desired_state.pop('certificate'))
+
+            client.auth.cert.create_ca_certificate_role(role_name,
+               tf.name, **desired_state
+            )
 
     return {'changed': changed}
 
