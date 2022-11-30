@@ -150,9 +150,6 @@ def hashivault_auth_cert(module):
         ##
         ## TODO: remove this tempfile workaround when this collection become > hvac v1.0  compatible
         ##
-        with open('/tmp/foobar', mode='w') as tf:
-            tf.write(desired_state['certificate'])
-
         with tempfile.NamedTemporaryFile(mode='w') as tf:
             tf.write(desired_state.pop('certificate'))
             tf.flush()
