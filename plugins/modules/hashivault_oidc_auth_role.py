@@ -24,6 +24,10 @@ options:
     bound_audiences:
         description:
             - List of `aud` claims to match against. Any match is sufficient.
+    role_type:
+        description:
+            - If this is an OIDC role or a JWT role.
+        default: oidc
     user_claim:
         description:
             - The claim to use to uniquely identify the user; this will be used as the name for the Identity entity
@@ -117,6 +121,7 @@ def main():
     argspec['name'] = dict(required=True, type='str')
     argspec['mount_point'] = dict(required=False, type='str', default='oidc')
     argspec['user_claim'] = dict(required=False, type='str', default='sub')
+    argspec['role_type'] = dict(required=False, type='str', default='oidc')
     argspec['allowed_redirect_uris'] = dict(required=True, type='list')
     argspec['bound_audiences'] = dict(required=False, type='list', default=[])
     argspec['bound_subject'] = dict(required=False, type='str', default='')
@@ -155,6 +160,7 @@ def hashivault_oidc_auth_role(module):
     client = hashivault_auth_client(params)
     parameters = [
         'allowed_redirect_uris',
+        'role_type',
         'bound_audiences',
         'bound_claims',
         'bound_subject',
@@ -180,7 +186,6 @@ def hashivault_oidc_auth_role(module):
     for parameter in parameters:
         if params.get(parameter) is not None:
             desired_state[parameter] = params.get(parameter)
-    desired_state['role_type'] = "oidc"
     desired_state['verbose_oidc_logging'] = False
     if not desired_state['token_policies'] and desired_state['policies']:
         desired_state['token_policies'] = desired_state['policies']
