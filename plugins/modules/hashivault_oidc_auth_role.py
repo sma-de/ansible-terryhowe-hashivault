@@ -206,6 +206,12 @@ def hashivault_oidc_auth_role(module):
 
     if changed and not module.check_mode:
         if state == 'present':
+            # note: this seems one of the very few cases where at least 
+            #   atm upstream api doesn't have a dedicated
+            #   "update-existing-role" method but tests have demonstrated
+            #   that it seems also be one of the few exceptions where it
+            #   is unproblematic to "re-create" an existing role when
+            #   the intention is to update it
             client.auth.oidc.create_role(name=name, **desired_state)
         elif current_state and state == 'absent':
             client.auth.oidc.delete_role(name=name)
