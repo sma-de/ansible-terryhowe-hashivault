@@ -205,7 +205,7 @@ def hashivault_oidc_auth_role(module):
             break
 
     if changed and not module.check_mode:
-        if not current_state and state == 'present':
+        if (not current_state or changed) and state == 'present':
             client.auth.oidc.create_role(name=name, **desired_state)
         elif current_state and state == 'absent':
             client.auth.oidc.delete_role(name=name)
