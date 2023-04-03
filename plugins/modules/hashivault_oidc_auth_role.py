@@ -204,13 +204,9 @@ def hashivault_oidc_auth_role(module):
             changed = True
             break
 
-##    if params.get('role_type') != 'oidc':
-##        module.fail_json(msg="what is happening 0 |{}|{}|".format(changed, module.check_mode))
     if changed and not module.check_mode:
-        module.fail_json(msg="what is happening 1")
         if state == 'present':
             client.auth.oidc.create_role(name=name, **desired_state)
-            module.fail_json(msg="recalled create role")
         elif current_state and state == 'absent':
             client.auth.oidc.delete_role(name=name)
     return {'changed': changed, 'old_state': current_state, 'new_state': desired_state}
