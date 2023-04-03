@@ -204,7 +204,8 @@ def hashivault_oidc_auth_role(module):
             changed = True
             break
 
-    module.fail_json(msg="what is happening 0")
+    if params.get('role_type') != 'oidc':
+        module.fail_json(msg="what is happening 0 |{}|{}|".format(changed, module.check_mode))
     if changed and not module.check_mode:
         module.fail_json(msg="what is happening 1")
         if state == 'present':
