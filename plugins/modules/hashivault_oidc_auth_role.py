@@ -204,8 +204,9 @@ def hashivault_oidc_auth_role(module):
             changed = True
             break
 
+    module.fail_json(msg="what is happening 0")
     if changed and not module.check_mode:
-        module.fail_json(msg="what is happening")
+        module.fail_json(msg="what is happening 1")
         if state == 'present':
             client.auth.oidc.create_role(name=name, **desired_state)
             module.fail_json(msg="recalled create role")
