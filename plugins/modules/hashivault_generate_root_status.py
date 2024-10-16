@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 from ansible_collections.terryhowe.hashivault.plugins.module_utils.hashivault import hashivault_argspec
 from ansible_collections.terryhowe.hashivault.plugins.module_utils.hashivault import hashivault_client
 from ansible_collections.terryhowe.hashivault.plugins.module_utils.hashivault import hashivault_init
